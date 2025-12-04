@@ -1,23 +1,44 @@
 {
-  "name": "md-toc",
+  "name": "mdtocroh",
   "displayName": "MDToc",
-  "description": "TBD",
+  "description": "Insert or update markdown table of contents either via command or fully automatic when saving the document. The toc can be configured via comments in each file.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.105.0"
   },
   "categories": [
-    "Other"
+    "Other",
+    "Visualization"
   ],
-  "activationEvents": [],
+  "activationEvents": ["onLanguage:markdown"],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "md-toc.helloWorld",
-        "title": "Hello World"
+        "command": "markdownToc.insertTOC",
+        "title": "MDToc: Insert/Update Table of Contents"
+      },
+      {
+        "command": "markdownToc.insertTOCConfig",
+        "title": "MDToc: Insert TOC Config Comments"
       }
-    ]
+    ],
+    "configuration": {
+      "title": "MDToc",
+      "properties": {
+        "markdownToc.insertConfigOnCreate": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically insert TOC config comments when a new Markdown file is created.",
+          "scope": "application"
+        },
+        "markdownToc.autoUpdateOnSave": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically update the Table of Contents when the document is saved."
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
