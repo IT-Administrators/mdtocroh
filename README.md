@@ -1,71 +1,63 @@
-# mdtocroh README
+# mdtocroh
 
-This is the README for your extension "mdtocroh". After writing up a brief description, we recommend including the following sections.
+*This VSCode extension creates (automated) table of contents in markdown.*
+
+## Introduction
+
+As im using vscode and write a lot in markdown, i decided to build an extension that creates table of contents in markdown automatically. 
+
+This extension is easy to use and keeps every markdown file up date if configured.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+This extension uses file inline configurations, implements settings via user or workspace and commands.
 
-For example if there is an image subfolder under your extension project workspace:
+***Why it uses inline commands for configurations:***
 
-\!\[feature X\]\(images/feature-x.png\)
+Unfortunately VSCode does not support settings per file, so using inline comment configurations was the only way to apply a different configuration to each markdown file.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### Commands
+
+- MDToc: Insert/Update Table of Contents
+    - Insert a toc if none is present or updates a present toc. Changes the toc accordingly to inline comment configurations.
+
+- MDToc: Insert TOC Config Comments
+    - Inserts the inline configurations if needed. Otherwise the toc is always created on top of the file.
+
+### Settings
+
+- insertConfigOnCreate
+    - Inserts the inline command configurations to every newly created markdown file if set to true. Default is false.
+
+- autoUpdateOnSave
+    - Automatically updates the toc or creates one if none is present. Takes the inline comment configurations into account. Default is false.
+
+### Inline Configurations
+
+Inline configurations are enclosed in html comments, this way they are not shown in file preview and are ignored by other markdown parsers.
+
+- toc:insertAfterHeading
+    - Insert the toc after the specified heading.
+
+- toc:insertAfterHeadingOffset
+    - Skip lines after the specified heading before inserting toc.
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
-
-## Extension Settings
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+There no requirements.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+There are no know issues.
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
+### 0.0.1
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial Release
 
 ---
 
-## Following extension guidelines
+## License
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+[MIT](/LICENSE)
