@@ -3,6 +3,7 @@
   "displayName": "MDToc",
   "description": "Insert or update markdown table of contents either via command or fully automatic when saving the document. The toc can be configured via comments in each file.",
   "readme": "./README.md",
+  "publisher": "IT-Administrators",
   "repository": {
     "type": "git",
     "url": "https://github.com/IT-Administrators/mdtocroh"
