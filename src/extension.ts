@@ -376,6 +376,6 @@ export function deactivate(): void {
 export const __test = {
   findTOCStart,
   findTOCEnd,
-  // updateTOC,
+  updateTOC,
   insertTOCConfig
 };
