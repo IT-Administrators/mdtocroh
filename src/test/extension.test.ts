@@ -3,6 +3,10 @@ import * as assert from 'assert';
 // You can import and use all API from the 'vscode' module
 // as well as import your extension to test it
 import * as vscode from 'vscode';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Extension functions.
 import { __test } from '../extension';
 
 suite('Extension Test Suite', () => {
@@ -116,5 +120,32 @@ suite('Extension Test Suite', () => {
 			// Should return start (0) because nothing to skip
 			assert.strictEqual(result, 0, 'Should return start index when no blanks or list items');
 		}
+	});
+
+	test('Should insert TOC config at top of file', async () => {
+		// Create a temp file.
+		const tmpFile = path.join(__dirname, 'tmp_test.md');
+		fs.writeFileSync(tmpFile, 'Original content\n');
+
+		// Open in VS Code.
+		const doc = await vscode.workspace.openTextDocument(tmpFile);
+		const editor = await vscode.window.showTextDocument(doc);
+
+		// Run the function.
+		__test.insertTOCConfig(editor);
+
+		// Save and reload
+		await doc.save();
+		const updated = fs.readFileSync(tmpFile, 'utf8');
+
+		// Expected inserted text
+		const expected =
+		`<!-- toc:insertAfterHeading= -->\n` +
+		`<!-- toc:insertAfterHeadingOffset=0 -->\n\n`;
+
+		assert.ok(updated.startsWith(expected), 'File should start with TOC config comments');
+
+		// Cleanup
+		fs.unlinkSync(tmpFile);
 	});
 });

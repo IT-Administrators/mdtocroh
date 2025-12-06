@@ -377,5 +377,5 @@ export const __test = {
   findTOCStart,
   findTOCEnd,
   // updateTOC,
-  // insertTOCConfig
+  insertTOCConfig
 };
