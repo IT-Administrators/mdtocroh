@@ -371,3 +371,11 @@ function findTOCEnd(lines: string[], start: number): number {
 export function deactivate(): void {
   // no-op
 }
+
+// Test variable to test the functions without exporting them.
+export const __test = {
+  findTOCStart,
+  findTOCEnd,
+  // updateTOC,
+  // insertTOCConfig
+};
