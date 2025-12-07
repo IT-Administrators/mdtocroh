@@ -1,6 +1,24 @@
+<!-- toc:insertAfterHeading=mdtocroh -->
+<!-- toc:insertAfterHeadingOffset=4 -->
+
 # mdtocroh
 
 *This VSCode extension creates (automated) table of contents in markdown.*
+
+
+## Table of Contents
+
+1. [Introduction](#introduction)
+1. [Features](#features)
+    1. [Commands](#commands)
+    1. [Settings](#settings)
+    1. [Inline Configurations](#inline-configurations)
+1. [Requirements](#requirements)
+1. [Known Issues](#known-issues)
+1. [Release Notes](#release-notes)
+    1. [0.0.1](#001)
+1. [License](#license)
+
 
 ## Introduction
 
