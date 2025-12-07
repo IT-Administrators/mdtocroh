@@ -200,7 +200,7 @@ API details.
     fs.unlinkSync(tmpFile);
   });
 
-  test('should not insert TOC if no headings exist', async () => {
+  test('Should not insert TOC if no headings exist', async () => {
     const tmpFile = path.join(__dirname, 'tmp_update_toc_empty.md');
     const initialContent = `<!-- toc:insertAfterHeading= -->
 <!-- toc:insertAfterHeadingOffset=0 -->
