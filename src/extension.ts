@@ -209,10 +209,20 @@ async function updateTOC(editor: vscode.TextEditor, allowWithoutConfig = false):
       }
     }
 
+    let inFence = false;
     // Collect headlines.
     const headlines = lines
       .map((line, idx) => ({ line, idx }))
       .filter(item => {
+        // Toggle fence state when encountering ``` or ~~~.
+        if (/^\s*(```|~~~)/.test(item.line)) {
+          inFence = !inFence;
+          return false; // Don’t treat fence markers as headings.
+        }
+
+        if (inFence) {
+          return false; // Skip everything inside fences.
+        }
         // Array containing all headlines.
         const match = item.line.match(/^(#{1,6})\s+(.*)$/);
         
