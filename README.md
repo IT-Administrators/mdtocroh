@@ -70,9 +70,7 @@ There are no know issues.
 
 ## Release Notes
 
-### 0.0.1
-
-Initial Release
+The release nodes are managed via [changelog](./CHANGELOG.md).
 
 ---
 
