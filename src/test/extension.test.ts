@@ -224,4 +224,20 @@ Just plain text without headings.
 
     fs.unlinkSync(tmpFile);
   });
+  
+  test('Should ignore fenced headline', async () => {
+	// Array of strings as oroginal filecontent is also splited to string array.
+	const lines = [
+  '```python',
+  '# Fake Headline',
+  '```',
+  '# Real Heading'
+];
+
+	const detector = __test.createFenceDetector();
+	assert.ok(detector(lines[0]) === true, "Should not match");  // Fence start
+	assert.ok(detector(lines[1]) === true, "Should not match");   // Inside fence
+	assert.ok(detector(lines[2]) === true, "Should not match");   // Fence end
+	assert.ok(detector(lines[3]) === false, "Should match");  // Outside fence
+	});
 });

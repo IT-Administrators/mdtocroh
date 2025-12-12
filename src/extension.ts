@@ -109,7 +109,7 @@ export function activate(context: vscode.ExtensionContext): void {
   context.subscriptions.push(openDocDisposable);
 }
 
-// Insert toc configuration.
+/**Insert toc configuration. */
 function insertTOCConfig(editor: vscode.TextEditor): void {
   // Default configurations for the toc config.
   const defaultHeading = "";
@@ -125,7 +125,8 @@ function insertTOCConfig(editor: vscode.TextEditor): void {
   });
 }
 
-// Update or insert toc.
+/** 
+Update or insert toc.*/
 async function updateTOC(editor: vscode.TextEditor, allowWithoutConfig = false): Promise<void> {
   
   if (isUpdatingTOC) {
@@ -209,20 +210,14 @@ async function updateTOC(editor: vscode.TextEditor, allowWithoutConfig = false):
       }
     }
 
-    let inFence = false;
+    let isInsideFence = createFenceDetector();
     // Collect headlines.
     const headlines = lines
       .map((line, idx) => ({ line, idx }))
       .filter(item => {
-        // Toggle fence state when encountering ``` or ~~~.
-        if (/^\s*(```|~~~)/.test(item.line)) {
-          inFence = !inFence;
-          return false; // Don’t treat fence markers as headings.
-        }
-
-        if (inFence) {
-          return false; // Skip everything inside fences.
-        }
+        if (isInsideFence(item.line)) {
+          return false; // Skip fences and their contents.
+        } 
         // Array containing all headlines.
         const match = item.line.match(/^(#{1,6})\s+(.*)$/);
         
@@ -345,9 +340,9 @@ async function updateTOC(editor: vscode.TextEditor, allowWithoutConfig = false):
     isUpdatingTOC = false;
   }
 }
-// Find the start of the toc.
-// The toc starts with the following string:
-// "<headline lvl> Table of Contents"
+/** Find the start of the toc.
+The toc starts with the following string:
+"<headline lvl> Table of Contents" */
 function findTOCStart(lines: string[]): number {
   for (let i = 0; i < lines.length; i++) {
     if (/^#{1,6}\s+Table of Contents\s*$/i.test(lines[i])) {
@@ -358,7 +353,7 @@ function findTOCStart(lines: string[]): number {
   return -1;
 }
 
-// Find toc end.
+/** Find the toc end. */
 function findTOCEnd(lines: string[], start: number): number {
   let i = start + 1;
 
@@ -378,6 +373,25 @@ function findTOCEnd(lines: string[], start: number): number {
   return i - 1;
 }
 
+/**
+ * Returns true if the given line is inside a fenced code block.
+ * We toggle state whenever encountering ``` or ~~~.
+ */
+export function createFenceDetector() {
+  // Check if currently inside fenced codeblock.
+  let inFence = false;
+
+  return (line: string): boolean => {
+    
+    if (/^\s*(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      return true; // Treat fence markers themselves as "inside fence".
+    }
+    
+    return inFence;
+  };
+}
+
 export function deactivate(): void {
   // no-op
 }
@@ -387,5 +401,6 @@ export const __test = {
   findTOCStart,
   findTOCEnd,
   updateTOC,
-  insertTOCConfig
+  insertTOCConfig,
+  createFenceDetector
 };
