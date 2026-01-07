@@ -1,6 +1,7 @@
 name: Test Extension
 
-on: [pull_request, push, workflow_dispatch, workflow_call]
+on:
+  [pull_request, push, workflow_dispatch, workflow_call]
 
 jobs:
   test:
@@ -15,4 +16,8 @@ jobs:
 
       - run: npm ci
 
-      - run: npm run test
+      - name: Install xvfb
+        run: sudo apt-get install xvfb
+
+      - name: Run tests
+        run: xvfb-run -a npm run test
