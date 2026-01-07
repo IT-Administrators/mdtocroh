@@ -30,8 +30,10 @@
       },
       {
         "command": "markdownToc.insertTOCConfig",
-        "title": "MDToc: Insert TOC Config Comments"
-      }
+        "title": "MDToc: Insert TOC Config Comments"      },
+      {
+        "command": "markdownToc.moveToHeading",
+        "title": "MDToc: Move to Heading"      }
     ],
     "configuration": {
       "title": "MDToc",

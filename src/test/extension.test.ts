@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 // Extension functions (import directly from toc).
-import { findTOCStart, findTOCEnd, insertTOCConfig, updateTOC, createFenceDetector } from '../toc';
+import { findTOCStart, findTOCEnd, insertTOCConfig, updateTOC, createFenceDetector, getHeadlines } from '../toc';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
@@ -240,4 +240,30 @@ Just plain text without headings.
 	assert.ok(detector(lines[2]) === true, "Should not match");   // Fence end
 	assert.ok(detector(lines[3]) === false, "Should match");  // Outside fence
 	});
+
+  test('Should parse headlines and ignore TOC and fences', () => {
+    const lines = [
+      '<!-- toc:insertAfterHeading= -->',
+      '<!-- toc:insertAfterHeadingOffset=0 -->',
+      '',
+      '# Intro',
+      'Some text',
+      '```',
+      '## Not a real heading',
+      '```',
+      '## Usage',
+      '### Details',
+      '###### Table of Contents',
+      '## API'
+    ];
+
+    const headlines = getHeadlines(lines);
+
+    // Expect to find Intro (line 3, level 1), Usage (line 8, level 2), Details (line 9, level 3), API (line 11, level 2)
+    assert.strictEqual(headlines.length, 4, 'Should find 4 headlines');
+    assert.deepStrictEqual(headlines[0], { title: 'Intro', level: 1, line: 3 });
+    assert.deepStrictEqual(headlines[1], { title: 'Usage', level: 2, line: 8 });
+    assert.deepStrictEqual(headlines[2], { title: 'Details', level: 3, line: 9 });
+    assert.deepStrictEqual(headlines[3], { title: 'API', level: 2, line: 11 });
+  });
 });

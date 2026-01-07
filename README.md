@@ -16,7 +16,6 @@
 1. [Requirements](#requirements)
 1. [Known Issues](#known-issues)
 1. [Release Notes](#release-notes)
-    1. [0.0.1](#001)
 1. [License](#license)
 
 
