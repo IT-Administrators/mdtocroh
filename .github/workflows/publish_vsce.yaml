@@ -1,0 +1,49 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/test.yml
+
+  publish:
+    needs: run-tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install vsce
+        run: npm install -g @vscode/vsce
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update package.json version from tag
+        run: |
+          TAG=${GITHUB_REF_NAME}
+          echo "Using tag version: $TAG"
+          npm version "$TAG" --no-git-tag-version
+
+      - name: Commit updated package.json
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add package.json package-lock.json
+          git commit -m "CI: update version to $GITHUB_REF_NAME" || echo "No changes to commit"
+
+      - name: Publish extension
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: vsce publish --pat "$VSCE_PAT"
