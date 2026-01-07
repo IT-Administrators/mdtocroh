@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Released]
 
+### 0.0.3
+
+- Added the command moveToHeading, which enables the user to move to a specific headline.
+
 ### 0.0.2
 
 #### Fixed
