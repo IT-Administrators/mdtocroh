@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.event.workflow_run.head_sha }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -48,10 +49,14 @@ jobs:
 
       - name: Commit updated package.json
         run: |
-          git config user.name "github-actions-bot"
-          git config user.email "github-actions-bot@github.com"
+          # Configure user
+          git config --global user.name "actions[bot].github"
+          git config --global user.email "actions[bot]@github.com"
+          # Stage any file changes to be committed. These files were changed by "nmp version" command.
           git add package.json package-lock.json
-          git commit -m "CI: update version to ${{ steps.version.outputs.TAG }}" || echo "No changes to commit"
+          git commit -m "CI: update version to ${{ steps.version.outputs.TAG }}"
+          # Push the commit back up to source GitHub repository.
+          git push
 
       - name: Publish extension
         env:
