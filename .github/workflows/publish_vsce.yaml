@@ -9,6 +9,7 @@ jobs:
   on-success:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -26,23 +27,37 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Update package.json version from tag
+      - name: Extract version tag
+        id: version
         run: |
-          TAG=${GITHUB_REF_NAME}
-          echo "Using tag version: $TAG"
-          npm version "$TAG" --no-git-tag-version
+          RAW_TAG="${{ github.event.workflow_run.head_branch }}"
+          echo "Raw tag: $RAW_TAG"
+
+          # Check if this is a version tag like v1.2.3
+          if [[ ! "$RAW_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Not a version tag. Skipping publish."
+            exit 1
+          fi
+
+          TAG="${RAW_TAG#v}"
+          echo "TAG=$TAG" >> $GITHUB_OUTPUT
+          echo "Using version: $TAG"
+
+      - name: Update package.json version
+        run: npm version "${{ steps.version.outputs.TAG }}" --no-git-tag-version
 
       - name: Commit updated package.json
         run: |
           git config user.name "github-actions-bot"
           git config user.email "github-actions-bot@github.com"
           git add package.json package-lock.json
-          git commit -m "CI: update version to $GITHUB_REF_NAME" || echo "No changes to commit"
+          git commit -m "CI: update version to ${{ steps.version.outputs.TAG }}" || echo "No changes to commit"
 
       - name: Publish extension
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: vsce publish --pat "$VSCE_PAT"
+
   on-failure:
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'failure' }}
