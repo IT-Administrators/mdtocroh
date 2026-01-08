@@ -10,7 +10,7 @@
   },
   "homepage": "https://github.com/IT-Administrators/mdtocroh",
   "icon": "img/mdtocroh-icon.png",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.105.0"
   },
@@ -30,10 +30,12 @@
       },
       {
         "command": "markdownToc.insertTOCConfig",
-        "title": "MDToc: Insert TOC Config Comments"      },
+        "title": "MDToc: Insert TOC Config Comments"
+      },
       {
         "command": "markdownToc.moveToHeading",
-        "title": "MDToc: Move to Heading"      }
+        "title": "MDToc: Move to Heading"
+      }
     ],
     "configuration": {
       "title": "MDToc",
