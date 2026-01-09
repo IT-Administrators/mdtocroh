@@ -59,6 +59,9 @@ Inline configurations are enclosed in html comments, this way they are not shown
 - toc:insertAfterHeadingOffset
     - Skip lines after the specified heading before inserting toc.
 
+- toc:moveToHeading
+    - Move to the position of the chosen headline from quickpick.
+
 ## Requirements
 
 There no requirements.
