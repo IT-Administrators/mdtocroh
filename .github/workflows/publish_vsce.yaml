@@ -1,22 +1,94 @@
 name: Publish VS Code Extension
 
+permissions:
+  contents: write
+
 on:
   workflow_run:
-    workflows: ['Test Extension']
+    workflows: ["Test Extension"]
     types: [completed]
 
 jobs:
-  on-success:
+  publish:
     runs-on: ubuntu-latest
-    # Check if triggering workflow was successfull and there was a tag push.
-    if: ${{ github.event.workflow_run.conclusion == 'success' && startsWith(github.ref, 'refs/tags/') }}
+
+    # Only run if:
+    # 1. Test workflow succeeded
+    # 2. The triggering run was for a tag starting with "v"
+    # startsWith(github.event.workflow_run.head_branch, 'v')
+    if: >
+      ${{
+        github.event.workflow_run.conclusion == 'success'
+      }}
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          git fetch --tags
+          raw_tag=$(git tag -l | sort -V | tail -n 1)
+
+          # Extract only MAJOR.MINOR.PATCH
+          clean_tag=$(echo "$raw_tag" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+
+          echo "raw_tag=$raw_tag" >> $GITHUB_OUTPUT
+          echo "clean_tag=$clean_tag" >> $GITHUB_OUTPUT
+
+      - name: Output tags
+        run: |
+          echo "Raw tag: ${{ steps.get_tag.outputs.raw_tag }}"
+          echo "Clean SemVer: ${{ steps.get_tag.outputs.clean_tag }}"
+
+      - name: Change package version
+        shell: pwsh
+        run: | 
+          $Path = "./package.json"
+          $NewVersion = "${{ steps.get_tag.outputs.clean_tag }}"
+
+          # Read and parse JSON
+          $json = Get-Content $Path -Raw | ConvertFrom-Json
+          $currentVersion = $json.version
+
+          # Split versions into arrays of integers
+          $currParts = $currentVersion.Split('.') | ForEach-Object { [int]$_ }
+          $newParts  = $NewVersion.Split('.')    | ForEach-Object { [int]$_ }
+
+          # Normalize lengths (e.g., 1.2 vs 1.2.0)
+          while ($currParts.Count -lt $newParts.Count) { 
+              $currParts += 0 
+          }
+          while ($newParts.Count -lt $currParts.Count) { 
+              $newParts += 0 
+          }
+
+          if ($currentVersion -eq $NewVersion) {
+              Write-Error "New version ($NewVersion) is same as current version ($currentVersion). Aborting."
+              exit 1
+          }
+
+          # Compare manually
+          for ($i = 0; $i -lt $currParts.Count; $i++) {
+              if ($newParts[$i] -lt $currParts[$i]) {
+                  Write-Error "New version ($NewVersion) is smaller than current version ($currentVersion). Aborting."
+                  exit 1
+              }
+              elseif ($newParts[$i] -gt $currParts[$i]) {
+                  break
+              }
+          }
+
+          # Update version
+          $json.version = $NewVersion
+
+          # Write back to file
+          $json | ConvertTo-Json -Depth 100 | Set-Content $Path -Encoding UTF8
+
+          Write-Output "Updated version from $currentVersion to $NewVersion"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -29,33 +101,18 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Extract version tag
-        id: version
-        run: |
-          RAW_TAG="${{ github.event.workflow_run.head_branch }}"
-          echo "Raw tag: $RAW_TAG"
-
-          # Check if this is a version tag like v1.2.3
-          if [[ ! "$RAW_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Not a version tag. Skipping publish."
-            exit 1
-          fi
-
-          TAG="${RAW_TAG#v}"
-          echo "TAG=$TAG" >> $GITHUB_OUTPUT
-          echo "Using version: $TAG"
-
-      - name: Update package.json version
-        run: npm version "${{ steps.version.outputs.TAG }}" --no-git-tag-version
-
       - name: Commit updated package.json
         run: |
           # Configure user
           git config --global user.name "actions[bot].github"
           git config --global user.email "actions[bot]@github.com"
-          # Stage any file changes to be committed. These files were changed by "nmp version" command.
-          git add package.json package-lock.json
-          git commit -m "CI: update version to ${{ steps.version.outputs.TAG }}"
+
+          # Stage any file changes to be committed.
+          git add .
+
+          # Make commit with staged changes
+          git commit -m 'CI: Changed version to ${{ steps.get_tag.outputs.clean_tag }}.'
+
           # Push the commit back up to source GitHub repository.
           git push
 
@@ -63,9 +120,3 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: vsce publish --pat "$VSCE_PAT"
-
-  on-failure:
-    runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-    steps:
-      - run: echo 'The triggering workflow failed'
