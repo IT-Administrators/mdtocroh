@@ -19,7 +19,10 @@
     "Visualization"
   ],
   "activationEvents": [
-    "onLanguage:markdown"
+    "onLanguage:markdown",
+    "workspace.onDidCreateFiles",
+    "workspace.onDidOpenTextDocument",
+    "workspace.onWillSaveTextDocument"
   ],
   "main": "./dist/extension.js",
   "contributes": {

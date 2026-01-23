@@ -6,8 +6,11 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Extension functions (import directly from toc).
-import { findTOCStart, findTOCEnd, insertTOCConfig, updateTOC, createFenceDetector, getHeadlines } from '../toc';
+import { findTOCStart, findTOCEnd } from '../toc';
+import { insertTOCConfig } from '../commands/inserttocconfig';
+import { updateTOC } from '../commands/updatetoc';
+import { getHeadlines } from '../headlines';
+import { createFenceDetector } from '../fences';
 
 suite('Extension Test Suite', () => {
 	vscode.window.showInformationMessage('Start all tests.');
