@@ -41,6 +41,9 @@ Unfortunately VSCode does not support settings per file, so using inline comment
 - MDToc: Insert TOC Config Comments
     - Inserts the inline configurations if needed. Otherwise the toc is always created on top of the file.
 
+- MDToC: Move To Heading
+    - Move to the position of the chosen headline from quickpick.
+
 ### Settings
 
 - insertConfigOnCreate
@@ -58,9 +61,6 @@ Inline configurations are enclosed in html comments, this way they are not shown
 
 - toc:insertAfterHeadingOffset
     - Skip lines after the specified heading before inserting toc.
-
-- toc:moveToHeading
-    - Move to the position of the chosen headline from quickpick.
 
 ## Requirements
 
